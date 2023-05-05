@@ -1,8 +1,12 @@
 import express, {Request, Response} from'express';
+import bodyParser from 'body-parser';
 
 const app = express();
 
 app.use(express.json());
+
+const parserMiddleware = bodyParser({})
+app.use(parserMiddleware)
 
 const port = process.env.PORT || 3003;
 
@@ -30,6 +34,39 @@ app.get('/product/:id', (req: Request, res: Response) => {
     }
 });
 
+app.delete('/product/:id', (req: Request, res: Response) => {
+    for(let i = 0; i< product.length; i++) {
+        if(product[i].id === + req.params.id) {
+            product.splice(i, 1);
+            res.send(204);
+
+            return;
+        }
+    }
+
+    res.send(404);
+});
+
+app.post('/product', (req: Request, res: Response) => {
+    const newProduct = {
+        id: +(new Date()), 
+        title: req.body.title
+    }
+
+    product.push(newProduct);
+    res.status(201).send(newProduct);
+});
+
+app.put('/product/:id', (req: Request, res: Response) => {
+    const newProduct = product.find(t => t.id === +req.params.id);
+    if(newProduct){
+        newProduct.title = req.body.title;
+        res.status(201).send(newProduct); 
+    }
+    else {
+        res.send(404);
+    }
+});
 
 
 app.get('/addresses', (req: Request, res: Response) => {
